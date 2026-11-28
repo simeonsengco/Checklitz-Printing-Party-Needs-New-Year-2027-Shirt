@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
-import { CheckCircle2, Clock, Mail, MapPin, MessageSquare, Phone } from 'lucide-react';
+import { CheckCircle2, Clock, Mail, MapPin, MessageSquare, Phone, ChevronDown } from 'lucide-react';
 import { BUSINESS_INFO, SERVICE_CATEGORIES } from '../data/products';
 import { validateContactForm } from '../lib/store';
 import { ContactForm } from '../types/store';
@@ -234,6 +234,7 @@ export const ContactPage: React.FC = () => {
                   >
                     Inquiry Topic
                   </label>
+                  <div className="relative">
                   <select
                     id="contact-topic"
                     value={form.topic}
@@ -243,13 +244,15 @@ export const ContactPage: React.FC = () => {
                         topic: e.target.value as ContactForm['topic'],
                       })
                     }
-                    className="w-full min-h-[42px] px-3.5 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-sm text-zinc-950 dark:text-white focus:outline-none focus:border-[#0D3BFF]"
+                    className="w-full min-h-[42px] appearance-none cursor-pointer pl-3 pr-10 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-sm text-zinc-950 dark:text-white focus:outline-none focus:border-[#0D3BFF]"
                   >
                     <option value="Custom Printing">Custom Printing</option>
                     <option value="Bulk Party Order">Bulk Party Order</option>
                     <option value="Order Support">Order Support</option>
                     <option value="General Inquiry">General Inquiry</option>
                   </select>
+                  <ChevronDown className="w-3.5 h-3.5 text-zinc-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                </div>
                 </div>
               </div>
 

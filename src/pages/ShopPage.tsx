@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { Search, SlidersHorizontal, X } from 'lucide-react';
+import { ChevronDown, Search, SlidersHorizontal, X } from 'lucide-react';
 import { PRODUCTS } from '../data/products';
 import { filterAndSortProducts } from '../lib/store';
 import {
@@ -89,16 +89,19 @@ export const ShopPage: React.FC<ShopPageProps> = ({
         <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-3.5">
           {/* Category Filter Combo Box — matches Price/Select style */}
           <div className="w-full xl:w-auto shrink-0">
-            <select
-              aria-label="Filter by category"
-              value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value as ProductCategory | 'All')}
-              className="min-h-[40px] w-full xl:w-48 px-3 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-xs font-medium text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-[#0D3BFF] whitespace-nowrap"
-            >
-              {CATEGORIES.map((category) => (
-                <option key={category} value={category}>{category}</option>
-              ))}
-            </select>
+            <div className="relative">
+              <select
+                aria-label="Filter by category"
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value as ProductCategory | 'All')}
+                className="min-h-[40px] w-full xl:w-48 appearance-none cursor-pointer pl-3 pr-10 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-xs font-medium text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-[#0D3BFF] whitespace-nowrap"
+              >
+                {CATEGORIES.map((category) => (
+                  <option key={category} value={category}>{category}</option>
+                ))}
+              </select>
+              <ChevronDown className="w-4 h-4 text-zinc-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+            </div>
           </div>
 
           {/* Search, Price, Sort Controls — single aligned row on sm+ */}
@@ -117,29 +120,35 @@ export const ShopPage: React.FC<ShopPageProps> = ({
 
             <div className="flex flex-wrap sm:flex-nowrap items-center gap-2 shrink-0">
               <SlidersHorizontal className="w-4 h-4 text-zinc-500 dark:text-zinc-400 hidden sm:block shrink-0" />
-              <select
-                aria-label="Filter by price range"
-                value={priceFilter}
-                onChange={(e) => setPriceFilter(e.target.value as PriceFilter)}
-                className="min-h-[40px] flex-1 min-w-[120px] px-3 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-xs font-medium text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-[#0D3BFF] whitespace-nowrap"
-              >
-                <option value="all">All Prices</option>
-                <option value="under-600">Under ₱600</option>
-                <option value="600-700">₱600 – ₱700</option>
-                <option value="over-700">Over ₱700</option>
-              </select>
+              <div className="relative flex-1 min-w-[120px]">
+                <select
+                  aria-label="Filter by price range"
+                  value={priceFilter}
+                  onChange={(e) => setPriceFilter(e.target.value as PriceFilter)}
+                  className="min-h-[40px] w-full appearance-none cursor-pointer pl-3 pr-10 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-xs font-medium text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-[#0D3BFF] whitespace-nowrap"
+                >
+                  <option value="all">All Prices</option>
+                  <option value="under-600">Under ₱600</option>
+                  <option value="600-700">₱600 – ₱700</option>
+                  <option value="over-700">Over ₱700</option>
+                </select>
+                <ChevronDown className="w-4 h-4 text-zinc-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+              </div>
 
-              <select
-                aria-label="Sort products"
-                value={sortOption}
-                onChange={(e) => setSortOption(e.target.value as SortOption)}
-                className="min-h-[40px] flex-1 min-w-[120px] px-3 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-xs font-medium text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-[#0D3BFF] whitespace-nowrap"
-              >
-                <option value="featured">Sort: Featured</option>
-                <option value="price-asc">Price: Low to High</option>
-                <option value="price-desc">Price: High to Low</option>
-                <option value="name-asc">Name: A to Z</option>
-              </select>
+              <div className="relative flex-1 min-w-[120px]">
+                <select
+                  aria-label="Sort products"
+                  value={sortOption}
+                  onChange={(e) => setSortOption(e.target.value as SortOption)}
+                  className="min-h-[40px] w-full appearance-none cursor-pointer pl-3 pr-10 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-xs font-medium text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-[#0D3BFF] whitespace-nowrap"
+                >
+                  <option value="featured">Sort: Featured</option>
+                  <option value="price-asc">Price: Low to High</option>
+                  <option value="price-desc">Price: High to Low</option>
+                  <option value="name-asc">Name: A to Z</option>
+                </select>
+                <ChevronDown className="w-4 h-4 text-zinc-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+              </div>
             </div>
           </div>
         </div>

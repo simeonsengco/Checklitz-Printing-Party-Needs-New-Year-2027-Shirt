@@ -4,6 +4,7 @@ import {
   ArrowLeft,
   Check,
   CheckCircle2,
+  ChevronDown,
   Copy,
   CreditCard,
   Info,
@@ -482,7 +483,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
                   id="checkout-province"
                   value={form.province}
                   onChange={(e) => updateField('province', e.target.value)}
-                  className="w-full min-h-[42px] px-3.5 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-sm text-zinc-950 dark:text-white focus:outline-none focus:border-[#0D3BFF]"
+                  className="w-full min-h-[42px] appearance-none cursor-pointer pl-3 pr-10 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-sm text-zinc-950 dark:text-white focus:outline-none focus:border-[#0D3BFF]"
                 >
                   {PH_PROVINCES.map((prov) => (
                     <option key={prov} value={prov}>
@@ -490,6 +491,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
                     </option>
                   ))}
                 </select>
+                <ChevronDown className="w-3.5 h-3.5 text-zinc-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                 {errors.province && (
                   <p className="text-xs text-red-500 mt-1">{errors.province}</p>
                 )}
