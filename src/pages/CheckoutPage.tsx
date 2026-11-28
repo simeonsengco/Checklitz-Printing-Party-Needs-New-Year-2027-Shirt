@@ -72,6 +72,15 @@ const PAYMENT_OPTIONS: Array<{
   },
 ];
 
+function readFileAsDataURL(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = (err) => reject(err);
+  });
+}
+
 const EWALLET_NUMBER = '09934039625';
 
 const LANDBANK_DETAILS = {
@@ -151,7 +160,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const validationErrors = validateCheckoutForm(form);
     if (Object.keys(validationErrors).length > 0) {
@@ -172,6 +181,12 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
       })
       .filter((entry): entry is NonNullable<typeof entry> => entry !== null);
 
+    const proofFile = form.paymentProof || null;
+    const proofBase64 =
+      proofFile && proofFile instanceof File
+        ? await readFileAsDataURL(proofFile)
+        : null;
+
     const receipt: OrderReceipt = {
       orderNumber: generateOrderNumber(),
       createdAt: new Date().toLocaleString('en-PH', {
@@ -182,6 +197,9 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
       items: orderItems,
       summary: { ...summary },
     };
+
+    // Persist payment proof as a base64 data URL on the receipt so admin can view it.
+    ;(receipt.customer as any).paymentProofBase64 = proofBase64;
 
     onOrderComplete(receipt);
   };
@@ -670,7 +688,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
                             <span className="text-xs text-zinc-500 dark:text-zinc-400">JPG/PNG, max 5MB</span>
                             <input
                               type="file"
-                              accept="image/*"
+                              accept="image/png, image/jpeg, image/webp"
                               onChange={handleProofUpload}
                               className="sr-only"
                               aria-label="Upload payment proof"

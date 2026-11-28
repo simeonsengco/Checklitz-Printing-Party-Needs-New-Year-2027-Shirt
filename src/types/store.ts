@@ -50,6 +50,7 @@ export interface Product {
   images: ProductImage[];
   description: string;
   designHighlights: string[];
+  soldOut?: boolean;
   fabricSpecs: {
     material: string;
     weight: string;
@@ -90,6 +91,7 @@ export interface CheckoutForm {
   notes: string;
   // Payment proof fields (for gcash, maya, bank-transfer)
   paymentProof?: File | null;
+  paymentProofBase64?: string;
   referenceNumber?: string;
   // GCash/Maya specific
   ewalletNumber?: string;
