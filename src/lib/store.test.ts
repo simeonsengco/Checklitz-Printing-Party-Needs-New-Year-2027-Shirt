@@ -21,7 +21,7 @@ import type { CheckoutForm } from '../types/store.ts';
 
 describe('Checklitz Storefront Pure Logic', () => {
   it('formats PHP currency without decimals cleanly', () => {
-    assert.equal(formatPhp(580), '₱580');
+    assert.equal(formatPhp(350), '₱350');
     assert.equal(formatPhp(1500), '₱1,500');
   });
 
@@ -87,25 +87,25 @@ describe('Checklitz Storefront Pure Logic', () => {
     assert.equal(empty.shippingFee, 0);
     assert.equal(empty.total, 0);
 
-    // Below threshold: 1 * 580 = 580 + 95 shipping
+    // Below threshold: 1 * 350 = 350 + 50 shipping
     const single = calculateCartTotals(
       [{ productId: 'chk-2027-001', size: 'M', quantity: 1 }],
       PRODUCTS
     );
-    assert.equal(single.subtotal, 580);
+    assert.equal(single.subtotal, 350);
     assert.equal(single.shippingFee, STANDARD_SHIPPING_FEE);
-    assert.equal(single.total, 580 + STANDARD_SHIPPING_FEE);
+    assert.equal(single.total, 350 + STANDARD_SHIPPING_FEE);
     assert.equal(single.qualifiesForFreeShipping, false);
-    assert.equal(single.freeShippingRemaining, FREE_SHIPPING_THRESHOLD - 580);
+    assert.equal(single.freeShippingRemaining, FREE_SHIPPING_THRESHOLD - 350);
 
-    // Above threshold: 3 * 580 = 1740 -> free shipping
+    // Above threshold: 5 * 350 = 1750 >= 1500 -> free shipping
     const bulk = calculateCartTotals(
-      [{ productId: 'chk-2027-001', size: 'L', quantity: 3 }],
+      [{ productId: 'chk-2027-001', size: 'L', quantity: 5 }],
       PRODUCTS
     );
-    assert.equal(bulk.subtotal, 1740);
+    assert.equal(bulk.subtotal, 1750);
     assert.equal(bulk.shippingFee, 0);
-    assert.equal(bulk.total, 1740);
+    assert.equal(bulk.total, 1750);
     assert.equal(bulk.qualifiesForFreeShipping, true);
     assert.equal(bulk.freeShippingRemaining, 0);
   });

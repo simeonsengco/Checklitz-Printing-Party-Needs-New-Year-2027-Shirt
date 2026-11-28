@@ -38,7 +38,7 @@ export const SERVICE_CATEGORIES = [
 export const ALL_SIZES: ShirtSize[] = ['XS', 'S', 'M', 'L', 'XL', '2XL'];
 
 export const FREE_SHIPPING_THRESHOLD = 1500;
-export const STANDARD_SHIPPING_FEE = 95;
+export const STANDARD_SHIPPING_FEE = 50;
 
 export const PRODUCTS: Product[] = [
   {
@@ -46,7 +46,7 @@ export const PRODUCTS: Product[] = [
     slug: 'hello-2027-make-it-count',
     name: 'Hello 2027 — Make It Count Tee',
     subtitle: 'Fireworks & Rainbow 2027 Script',
-    price: 580,
+    price: 350,
     categories: ['2027 New Year', 'New Arrivals', 'Best Sellers'],
     collectionTheme: 'Hello 2027 & Party',
     tag: 'Best Seller',
@@ -80,7 +80,7 @@ export const PRODUCTS: Product[] = [
     slug: '2027-new-year-new-vibes',
     name: '2027 — New Year, New Vibes Tee',
     subtitle: 'Disco Ball & Retro Party Graphic',
-    price: 580,
+    price: 350,
     categories: ['2027 New Year', 'New Arrivals'],
     collectionTheme: 'Hello 2027 & Party',
     tag: 'New Drop',
@@ -114,7 +114,7 @@ export const PRODUCTS: Product[] = [
     slug: '2027-year-of-the-fire-goat',
     name: '2027 — Year of the Fire Goat Tee',
     subtitle: 'Auspicious Zodiac Emblem & Lanterns',
-    price: 650,
+    price: 350,
     categories: ['2027 New Year', 'Fire Goat Series', 'Best Sellers'],
     collectionTheme: 'Fire Goat Zodiac',
     tag: 'Zodiac Edition',
@@ -148,7 +148,7 @@ export const PRODUCTS: Product[] = [
     slug: 'hello-2027-geometric-goat',
     name: 'Hello 2027 — Stacked Geometric Tee',
     subtitle: 'Modern Color-Block Typography & Goat Crest',
-    price: 590,
+    price: 350,
     categories: ['2027 New Year', 'Fire Goat Series', 'New Arrivals'],
     collectionTheme: 'Hello 2027 & Party',
     featured: true,
@@ -181,7 +181,7 @@ export const PRODUCTS: Product[] = [
     slug: '2027-club-new-era-flame',
     name: '2027 Club — New Year, New Era (Flame)',
     subtitle: 'Chrome Streetwear Front & Back Neck Crest',
-    price: 720,
+    price: 350,
     categories: ['2027 New Year', 'Fire Goat Series', 'Club Edition', 'Best Sellers'],
     collectionTheme: '2027 Club Street',
     tag: 'Front + Back Print',
@@ -219,7 +219,7 @@ export const PRODUCTS: Product[] = [
     slug: '2027-club-chrome-lightning',
     name: '2027 Club — Chrome Era (Lightning)',
     subtitle: 'Y2K Chrome Typography & Back Neck Crest',
-    price: 720,
+    price: 350,
     categories: ['2027 New Year', 'Fire Goat Series', 'Club Edition', 'New Arrivals'],
     collectionTheme: '2027 Club Street',
     tag: 'Front + Back Print',
@@ -257,7 +257,7 @@ export const PRODUCTS: Product[] = [
     slug: 'fire-goat-social-club-2027',
     name: 'Fire Goat Social Club — 2027 Varsity',
     subtitle: 'Circular Club Seal & Sparkler Mascot',
-    price: 650,
+    price: 350,
     categories: ['2027 New Year', 'Fire Goat Series', 'Club Edition', 'Best Sellers'],
     collectionTheme: 'Fire Goat Zodiac',
     tag: 'Limited Drop',
