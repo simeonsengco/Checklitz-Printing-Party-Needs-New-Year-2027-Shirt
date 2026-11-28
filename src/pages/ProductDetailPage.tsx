@@ -10,7 +10,7 @@ import {
   Shirt,
   Truck,
 } from 'lucide-react';
-import { PRODUCTS } from '../data/products';
+import { useProducts } from '../context/ProductsContext';
 import { formatPhp } from '../lib/store';
 import { Product, ShirtSize } from '../types/store';
 import { ProductCard } from '../components/ProductCard';
@@ -36,6 +36,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
   onBuyNow,
   onOpenSizeGuide,
 }) => {
+  const { products } = useProducts();
   const [selectedSize, setSelectedSize] = useState<ShirtSize>('M');
   const [quantity, setQuantity] = useState(1);
   const [activeImageIdx, setActiveImageIdx] = useState(0);
@@ -48,7 +49,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
   }, [product.id]);
 
   const activeImage = product.images[activeImageIdx] ?? product.images[0];
-  const relatedProducts = PRODUCTS.filter((p) => p.id !== product.id).slice(0, 3);
+  const relatedProducts = products.filter((p) => p.id !== product.id).slice(0, 3);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
@@ -235,20 +236,22 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
               <motion.button
                 type="button"
                 whileTap={{ scale: 0.98 }}
-                onClick={() => onAddToCart(product, selectedSize, quantity)}
-                className="flex-1 min-h-[46px] px-5 py-3 rounded-xl bg-zinc-950 dark:bg-[#0D3BFF] text-white text-sm font-semibold hover:bg-[#0D3BFF] dark:hover:bg-blue-500 transition-colors"
+                onClick={() => !product.soldOut && onAddToCart(product, selectedSize, quantity)}
+                disabled={product.soldOut}
+                className="flex-1 min-h-[46px] px-5 py-3 rounded-xl text-sm font-semibold transition-colors {product.soldOut && 'bg-zinc-400 text-zinc-200 cursor-not-allowed opacity-50' || 'bg-zinc-950 dark:bg-[#0D3BFF] text-white hover:bg-[#0D3BFF] dark:hover:bg-blue-500'}"
               >
-                Add to Cart — {formatPhp(product.price * quantity)}
+                {product.soldOut ? 'Sold Out' : `Add to Cart — ${formatPhp(product.price * quantity)}`}
               </motion.button>
             </div>
 
             <motion.button
               type="button"
               whileTap={{ scale: 0.98 }}
-              onClick={() => onBuyNow(product, selectedSize, quantity)}
-              className="w-full min-h-[46px] px-5 py-3 rounded-xl border border-zinc-950 dark:border-zinc-600 text-zinc-950 dark:text-white text-sm font-semibold hover:bg-zinc-100 dark:hover:bg-zinc-800/80 transition-colors"
+              onClick={() => !product.soldOut && onBuyNow(product, selectedSize, quantity)}
+              disabled={product.soldOut}
+              className="w-full min-h-[46px] px-5 py-3 rounded-xl text-sm font-semibold transition-colors {product.soldOut && 'border border-zinc-400 text-zinc-500 dark:text-zinc-500 cursor-not-allowed opacity-50' || 'border border-zinc-950 dark:border-zinc-600 text-zinc-950 dark:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800/80'}"
             >
-              Buy Now
+              {product.soldOut ? 'Sold Out' : 'Buy Now'}
             </motion.button>
           </div>
 

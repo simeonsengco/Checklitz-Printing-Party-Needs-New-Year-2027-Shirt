@@ -196,13 +196,11 @@ export const QuickViewModal: React.FC<QuickViewModalProps> = ({
                 <motion.button
                   type="button"
                   whileTap={{ scale: 0.98 }}
-                  onClick={() => {
-                    onAddToCart(product, selectedSize, quantity);
-                    onClose();
-                  }}
-                  className="w-full min-h-[44px] px-5 py-3 rounded-xl bg-zinc-950 dark:bg-[#0D3BFF] text-white text-sm font-semibold hover:bg-[#0D3BFF] dark:hover:bg-blue-500 transition-colors"
+                  onClick={() => !product.soldOut && (onAddToCart(product, selectedSize, quantity), onClose())}
+                  disabled={product.soldOut}
+                  className="w-full min-h-[44px] px-5 py-3 rounded-xl text-sm font-semibold transition-colors {product.soldOut && 'bg-zinc-400 text-zinc-200 cursor-not-allowed opacity-50' || 'bg-zinc-950 dark:bg-[#0D3BFF] text-white hover:bg-[#0D3BFF] dark:hover:bg-blue-500'}"
                 >
-                  Add to Cart — {formatPhp(product.price * quantity)}
+                  {product.soldOut ? 'Sold Out' : `Add to Cart — ${formatPhp(product.price * quantity)}`}
                 </motion.button>
 
                 <button

@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { motion } from 'motion/react';
-import { PRODUCTS } from '../data/products';
+import { useProducts } from '../context/ProductsContext';
 import { filterAndSortProducts } from '../lib/store';
 import { CollectionTheme, Product, ShirtSize } from '../types/store';
 import { ProductCard } from '../components/ProductCard';
@@ -39,11 +39,12 @@ export const Collection2027Page: React.FC<Collection2027PageProps> = ({
   onQuickView,
   onQuickAdd,
 }) => {
+  const { products } = useProducts();
   const [activeTheme, setActiveTheme] = useState<CollectionTheme | 'All'>('All');
 
   const items = useMemo(
     () =>
-      filterAndSortProducts(PRODUCTS, {
+      filterAndSortProducts(products, {
         theme: activeTheme,
         sort: 'featured',
       }),
@@ -79,7 +80,7 @@ export const Collection2027Page: React.FC<Collection2027PageProps> = ({
         </div>
 
         <div className="relative z-[1] lg:col-span-5 grid grid-cols-3 gap-3">
-          {[PRODUCTS[0], PRODUCTS[2], PRODUCTS[4]].map((item, idx) => (
+          {[products[0], products[2], products[4]].map((item, idx) => (
             <motion.button
               key={item.id}
               type="button"

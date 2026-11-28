@@ -29,6 +29,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 
   const handleQuickAddClick = (e: React.MouseEvent) => {
     e.stopPropagation();
+    if (product.soldOut) return;
     onQuickAdd(product, 'M');
     setAddedFeedback(true);
     window.setTimeout(() => setAddedFeedback(false), 1200);
@@ -107,6 +108,13 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             {showBackOnHover ? 'Back Print' : 'Front + Back'}
           </span>
         )}
+        {product.soldOut && (
+          <div className="absolute inset-0 z-[3] flex items-center justify-center bg-black/60 dark:bg-black/70" aria-hidden="true">
+            <span className="px-4 py-2 bg-red-600 text-white text-sm font-semibold rounded-lg uppercase tracking-wider shadow-lg">
+              Sold Out
+            </span>
+          </div>
+        )}
       </div>
 
       {/* Product Details */}
@@ -148,14 +156,17 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             type="button"
             whileTap={{ scale: 0.95 }}
             onClick={handleQuickAddClick}
+            disabled={product.soldOut}
             className={`w-full sm:w-auto min-h-[38px] px-3 sm:px-3.5 py-2 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors duration-150 whitespace-nowrap shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D3BFF] ${
-              addedFeedback
+              product.soldOut
+                ? 'bg-zinc-400 text-zinc-200 cursor-not-allowed opacity-50'
+                : addedFeedback
                 ? 'bg-emerald-700 text-white'
                 : 'bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 hover:bg-[#0D3BFF] dark:hover:bg-blue-400 dark:hover:text-zinc-950'
             }`}
           >
             <ShoppingBag className="w-3.5 h-3.5" />
-            <span>{addedFeedback ? 'Added (M)' : 'Add to Cart'}</span>
+            <span>{product.soldOut ? 'Sold Out' : addedFeedback ? 'Added (M)' : 'Add to Cart'}</span>
           </motion.button>
         </div>
       </div>

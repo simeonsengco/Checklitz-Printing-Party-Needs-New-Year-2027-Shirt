@@ -1,17 +1,16 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { formatPhp } from '../lib/store';
 import {
-  CartItem,
   CheckoutForm,
   OrderReceipt,
   OrderStatus,
   Product,
 } from '../types/store';
+import { useProducts } from '../context/ProductsContext';
 
 interface AdminPageProps {
   onBack: () => void;
   orders: OrderReceipt[];
-  products: Product[];
   onUpdateOrderStatus?: (orderNumber: string, status: OrderStatus) => void;
 }
 
@@ -51,9 +50,9 @@ function saveStoredHash(salt: string, hash: string) {
 export const AdminPage: React.FC<AdminPageProps> = ({
   onBack,
   orders: initialOrders,
-  products,
   onUpdateOrderStatus,
 }) => {
+  const { products, updateProduct } = useProducts();
   const [authenticated, setAuthenticated] = useState(false);
   const [email, setEmail] = useState(ADMIN_EMAIL);
   const [password, setPassword] = useState('');
@@ -207,17 +206,11 @@ export const AdminPage: React.FC<AdminPageProps> = ({
     setShowPasswordSetup(false);
   };
 
-  const setProductPriceAndSoldOut = (
+  const handleUpdateProduct = (
     productId: string,
-    price: number,
-    soldOut: boolean
+    updates: { price?: number; soldOut?: boolean }
   ) => {
-    try {
-      const raw = localStorage.getItem('checklitz_product_overrides_v1');
-      const overrides = raw ? JSON.parse(raw) : {};
-      overrides[productId] = { ...(overrides[productId] || {}), price, soldOut };
-      localStorage.setItem('checklitz_product_overrides_v1', JSON.stringify(overrides));
-    } catch {}
+    updateProduct(productId, updates);
   };
 
   if (!authenticated) {

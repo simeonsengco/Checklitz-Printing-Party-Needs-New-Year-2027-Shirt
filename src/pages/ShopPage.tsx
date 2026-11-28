@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { ChevronDown, Search, SlidersHorizontal, X } from 'lucide-react';
-import { PRODUCTS } from '../data/products';
+import { useProducts } from '../context/ProductsContext';
 import { filterAndSortProducts } from '../lib/store';
 import {
   PriceFilter,
@@ -35,13 +35,14 @@ export const ShopPage: React.FC<ShopPageProps> = ({
   onQuickView,
   onQuickAdd,
 }) => {
+  const { products } = useProducts();
   const [selectedCategory, setSelectedCategory] = useState<ProductCategory | 'All'>('All');
   const [priceFilter, setPriceFilter] = useState<PriceFilter>('all');
   const [sortOption, setSortOption] = useState<SortOption>('featured');
 
   const filteredProducts = useMemo(
     () =>
-      filterAndSortProducts(PRODUCTS, {
+      filterAndSortProducts(products, {
         category: selectedCategory,
         priceFilter,
         search: initialSearch,
@@ -80,7 +81,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({
         </div>
 
         <p className="text-sm text-zinc-500 dark:text-zinc-400 font-mono tabular-nums">
-          Showing {filteredProducts.length} of {PRODUCTS.length} designs
+          Showing {filteredProducts.length} of {products.length} designs
         </p>
       </div>
 

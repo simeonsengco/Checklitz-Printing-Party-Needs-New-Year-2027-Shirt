@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { ArrowRight, Check, Pause, Play, Sparkles } from 'lucide-react';
-import { PRODUCTS } from '../data/products';
+import { useProducts } from '../context/ProductsContext';
 import { formatPhp } from '../lib/store';
 import { PageRoute, Product, ShirtSize } from '../types/store';
 import { ProductCard } from '../components/ProductCard';
@@ -35,16 +35,17 @@ export const HomePage: React.FC<HomePageProps> = ({
   onQuickView,
   onQuickAdd,
 }) => {
+  const { products } = useProducts();
   const heroProducts = HERO_SPOTLIGHT_IDS.map((id) =>
-    PRODUCTS.find((p) => p.id === id)
+    products.find((p) => p.id === id)
   ).filter((p): p is Product => Boolean(p));
 
   const [activeHeroIdx, setActiveHeroIdx] = useState(0);
   const [autoCycle, setAutoCycle] = useState(true);
   const [tilt, setTilt] = useState({ rx: 0, ry: 0 });
 
-  const activeHeroProduct = heroProducts[activeHeroIdx] ?? PRODUCTS[0];
-  const featuredProducts = PRODUCTS.filter((p) => p.featured).slice(0, 6);
+  const activeHeroProduct = heroProducts[activeHeroIdx] ?? products[0];
+  const featuredProducts = products.filter((p) => p.featured).slice(0, 6);
 
   useEffect(() => {
     if (!autoCycle) return;
@@ -337,7 +338,7 @@ export const HomePage: React.FC<HomePageProps> = ({
             onClick={() => onNavigate('shop')}
             className="inline-flex items-center gap-1.5 text-sm font-semibold text-zinc-950 dark:text-zinc-100 hover:text-[#0D3BFF] dark:hover:text-blue-400 transition-colors self-start sm:self-auto"
           >
-            <span>Browse All {PRODUCTS.length} Designs</span>
+            <span>Browse All {products.length} Designs</span>
             <ArrowRight className="w-4 h-4" />
           </button>
         </div>
@@ -422,7 +423,7 @@ export const HomePage: React.FC<HomePageProps> = ({
               whileHover={{ y: -5, scale: 1.02 }}
               transition={{ type: 'spring', stiffness: 300, damping: 24 }}
               onClick={() => {
-                const p = PRODUCTS.find((item) => item.id === 'chk-2027-005');
+                const p = products.find((item) => item.id === 'chk-2027-005');
                 if (p) onSelectProduct(p);
               }}
               className="bg-white/5 border border-white/10 rounded-xl p-3 flex flex-col items-center gap-2 hover:bg-white/10 hover:border-blue-400/50 transition-colors"
@@ -443,7 +444,7 @@ export const HomePage: React.FC<HomePageProps> = ({
               whileHover={{ y: -5, scale: 1.02 }}
               transition={{ type: 'spring', stiffness: 300, damping: 24 }}
               onClick={() => {
-                const p = PRODUCTS.find((item) => item.id === 'chk-2027-005');
+                const p = products.find((item) => item.id === 'chk-2027-005');
                 if (p) onSelectProduct(p);
               }}
               className="bg-white/5 border border-white/10 rounded-xl p-3 flex flex-col items-center gap-2 hover:bg-white/10 hover:border-blue-400/50 transition-colors"

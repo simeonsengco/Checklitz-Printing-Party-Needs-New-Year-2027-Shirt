@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
-import { PRODUCTS } from './data/products';
+import { PRODUCTS as BASE_PRODUCTS } from './data/products';
+import { useProducts } from './context/ProductsContext';
 import {
   calculateCartTotals,
   removeCartItem,
@@ -65,7 +66,8 @@ function loadInitialTheme(): 'dark' | 'light' {
 
 export default function App() {
   const [route, setRoute] = useState<PageRoute>('home');
-  const [selectedProduct, setSelectedProduct] = useState<Product>(PRODUCTS[0]);
+  const { products } = useProducts();
+  const [selectedProduct, setSelectedProduct] = useState<Product>(products[0] ?? BASE_PRODUCTS[0]);
   const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
   const [sizeGuideOpen, setSizeGuideOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
@@ -98,7 +100,7 @@ export default function App() {
   }, [orders]);
 
   const cartSummary = useMemo(
-    () => calculateCartTotals(cart, PRODUCTS),
+    () => calculateCartTotals(cart, products),
     [cart]
   );
 
@@ -257,7 +259,7 @@ export default function App() {
             {route === 'checkout' && (
               <CheckoutPage
                 cart={cart}
-                products={PRODUCTS}
+                products={products}
                 summary={cartSummary}
                 onBackToShop={() => navigate('shop')}
                 onOrderComplete={handleOrderComplete}
@@ -273,7 +275,6 @@ export default function App() {
               <AdminPage
                 onBack={() => navigate('home')}
                 orders={orders}
-                products={PRODUCTS}
                 onUpdateOrderStatus={updateOrderStatus}
               />
             )}
@@ -286,7 +287,7 @@ export default function App() {
       <CartDrawer
         open={cartOpen}
         cart={cart}
-        products={PRODUCTS}
+        products={products}
         summary={cartSummary}
         onClose={() => setCartOpen(false)}
         onUpdateQuantity={handleUpdateQuantity}

@@ -4,9 +4,8 @@ import { ArrowRight, CheckCircle2, Layers, MapPin, Palette, ShieldCheck } from '
 import {
   BRAND_LOGO_URL,
   BUSINESS_INFO,
-  PRODUCTS,
-  SERVICE_CATEGORIES,
   SERVICES_BANNER_URL,
+  SERVICE_CATEGORIES,
 } from '../data/products';
 import { PageRoute } from '../types/store';
 
@@ -78,14 +77,14 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
           />
           <div className="grid grid-cols-2 gap-3 w-full">
             <img
-              src={PRODUCTS[2].images[0].src}
-              alt={PRODUCTS[2].name}
+              src={'/assets/aistudio/tshirtMockUp-2027-003_13fbd103.png'}
+              alt="Year of the Fire Goat Tee"
               referrerPolicy="no-referrer"
               className="w-full aspect-[4/5] object-contain bg-white dark:bg-[#121520] rounded-xl p-2 border border-zinc-200/70 dark:border-zinc-800"
             />
             <img
-              src={PRODUCTS[6].images[0].src}
-              alt={PRODUCTS[6].name}
+              src={'/assets/aistudio/tshirtMockUp-2027-007_f1257e54.png'}
+              alt="Fire Goat Social Club Tee"
               referrerPolicy="no-referrer"
               className="w-full aspect-[4/5] object-contain bg-white dark:bg-[#121520] rounded-xl p-2 border border-zinc-200/70 dark:border-zinc-800"
             />
