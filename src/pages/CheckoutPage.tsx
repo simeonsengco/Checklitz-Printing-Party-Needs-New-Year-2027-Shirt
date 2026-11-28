@@ -166,13 +166,13 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
             <CheckCircle2 className="w-8 h-8 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.12em] text-emerald-700 dark:text-emerald-400">
-                Order Confirmed (Demo Checkout)
+                Order Confirmed
               </p>
               <h1 className="font-display text-2xl sm:text-3xl font-bold text-zinc-950 dark:text-white mt-1">
                 Order #{lastOrder.orderNumber} — Preparing Shipment
               </h1>
               <p className="text-sm text-zinc-600 dark:text-zinc-300 mt-1.5">
-                Thank you, {lastOrder.customer.fullName}. A copy of this summary is ready for {lastOrder.customer.email}. No live payment was charged in this demo checkout.
+                Thank you, {lastOrder.customer.fullName}. A copy of this summary is ready for {lastOrder.customer.email}. No live payment was charged.
               </p>
             </div>
           </div>
@@ -334,17 +334,6 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
         <h1 className="font-display text-3xl font-bold text-zinc-950 dark:text-white mt-2">
           Checkout
         </h1>
-      </div>
-
-      {/* Clear Demo Checkout Indicator */}
-      <div
-        role="note"
-        className="mb-8 flex items-start gap-3 bg-blue-50 dark:bg-blue-950/35 border border-blue-200 dark:border-blue-800/70 rounded-xl px-4 py-3 text-xs sm:text-sm text-blue-950 dark:text-blue-100"
-      >
-        <Info className="w-4 h-4 text-[#0D3BFF] dark:text-blue-400 shrink-0 mt-0.5" />
-        <p>
-          <span className="font-semibold">Demo Checkout Mode:</span> This storefront demonstrates the complete Philippine checkout experience (GCash, Maya, COD, and Bank Transfer) without processing real payments or charging accounts.
-        </p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start">
@@ -624,7 +613,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
                       </div>
                     </div>
                     <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                      Send {formatPhp(summary.total)} to {EWALLET_NUMBER} and include your Order Number in your GCash note (demo checkout).
+                      Send {formatPhp(summary.total)} to {EWALLET_NUMBER} and include your Order Number in your GCash note.
                     </p>
                   </>
                 )}
@@ -670,7 +659,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
                       </div>
                     </div>
                     <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                      Send {formatPhp(summary.total)} to Maya number {EWALLET_NUMBER} and attach your Order Number (demo checkout).
+                      Send {formatPhp(summary.total)} to Maya number {EWALLET_NUMBER} and attach your Order Number.
                     </p>
                   </>
                 )}
@@ -765,7 +754,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
             className="w-full min-h-[48px] px-6 py-3.5 rounded-xl bg-zinc-950 dark:bg-[#0D3BFF] text-white text-sm font-semibold hover:bg-[#0D3BFF] dark:hover:bg-blue-500 transition-colors flex items-center justify-center gap-2"
           >
             <ShieldCheck className="w-4 h-4" />
-            <span>Place Demo Order — {formatPhp(summary.total)}</span>
+            <span>Place Order — {formatPhp(summary.total)}</span>
           </motion.button>
         </form>
 

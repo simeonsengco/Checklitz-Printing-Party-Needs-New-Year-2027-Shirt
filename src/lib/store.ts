@@ -244,12 +244,12 @@ export function getPaymentMethodSummary(form: CheckoutForm): {
     case 'gcash':
       return {
         title: 'GCash',
-        detail: 'GCash Number: 09934039625 · Demo checkout order logged',
+        detail: 'GCash Number: 09934039625 · Order logged',
       };
     case 'maya':
       return {
         title: 'Maya',
-        detail: 'Maya Number: 09934039625 · Demo checkout order logged',
+        detail: 'Maya Number: 09934039625 · Order logged',
       };
     case 'cod':
       return {
