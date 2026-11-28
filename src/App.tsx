@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { PRODUCTS } from './data/products';
 import {
@@ -10,6 +10,7 @@ import {
 import {
   CartItem,
   OrderReceipt,
+  OrderStatus,
   PageRoute,
   Product,
   ShirtSize,
@@ -26,6 +27,7 @@ import { ProductDetailPage } from './pages/ProductDetailPage';
 import { CheckoutPage } from './pages/CheckoutPage';
 import { AboutPage } from './pages/AboutPage';
 import { ContactPage } from './pages/ContactPage';
+import { AdminPage } from './pages/AdminPage';
 
 const CART_STORAGE_KEY = 'checklitz_cart_v1';
 const THEME_STORAGE_KEY = 'checklitz_theme';
@@ -33,6 +35,17 @@ const THEME_STORAGE_KEY = 'checklitz_theme';
 function loadInitialCart(): CartItem[] {
   try {
     const raw = window.localStorage.getItem(CART_STORAGE_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function loadInitialOrders(): OrderReceipt[] {
+  try {
+    const raw = window.localStorage.getItem('checklitz_orders_v1');
     if (!raw) return [];
     const parsed = JSON.parse(raw);
     return Array.isArray(parsed) ? parsed : [];
@@ -60,6 +73,7 @@ export default function App() {
   const [cart, setCart] = useState<CartItem[]>(loadInitialCart);
   const [lastOrder, setLastOrder] = useState<OrderReceipt | null>(null);
   const [theme, setTheme] = useState<'dark' | 'light'>(loadInitialTheme);
+  const [orders, setOrders] = useState<OrderReceipt[]>(loadInitialOrders);
 
   useEffect(() => {
     try {
@@ -77,6 +91,11 @@ export default function App() {
       // Ignore storage errors
     }
   }, [theme]);
+  useEffect(() => {
+    try {
+      window.localStorage.setItem('checklitz_orders_v1', JSON.stringify(orders));
+    } catch {}
+  }, [orders]);
 
   const cartSummary = useMemo(
     () => calculateCartTotals(cart, PRODUCTS),
@@ -146,11 +165,23 @@ export default function App() {
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
   };
 
+
   const handleOrderComplete = (receipt: OrderReceipt) => {
     setLastOrder(receipt);
+    setOrders((prev) => [receipt, ...prev].slice(0, 500));
     setCart([]);
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
   };
+
+
+  const updateOrderStatus = useCallback(
+    (orderNumber: string, status: OrderStatus) => {
+      setOrders((prev) =>
+        prev.map((o) => (o.orderNumber === orderNumber ? { ...o, status } : o))
+      );
+    },
+    []
+  );
 
   const toggleTheme = () => {
     setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
@@ -237,6 +268,15 @@ export default function App() {
             {route === 'about' && <AboutPage onNavigate={navigate} />}
 
             {route === 'contact' && <ContactPage />}
+
+            {route === 'admin' && (
+              <AdminPage
+                onBack={() => navigate('home')}
+                orders={orders}
+                products={PRODUCTS}
+                onUpdateOrderStatus={updateOrderStatus}
+              />
+            )}
           </motion.div>
         </AnimatePresence>
       </main>

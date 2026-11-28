@@ -5,7 +5,8 @@ export type PageRoute =
   | 'product'
   | 'checkout'
   | 'about'
-  | 'contact';
+  | 'contact'
+  | 'admin';
 
 export type ShirtSize = 'XS' | 'S' | 'M' | 'L' | 'XL' | '2XL';
 
@@ -99,9 +100,12 @@ export interface CheckoutForm {
   bankName?: string;
 }
 
+export type OrderStatus = 'pending' | 'paid' | 'shipped' | 'completed' | 'cancelled';
+
 export interface OrderReceipt {
   orderNumber: string;
   createdAt: string;
+  status?: OrderStatus;
   customer: CheckoutForm;
   items: Array<{
     product: Product;

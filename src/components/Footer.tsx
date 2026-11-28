@@ -106,7 +106,10 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
         </div>
 
         <div className="mt-12 pt-6 border-t border-zinc-800/80 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-zinc-500">
-          <p>
+          <p
+            onClick={() => onNavigate('admin')}
+            className="cursor-pointer hover:underline hover:text-zinc-900 dark:hover:text-white transition-colors"
+          >
             © {new Date().getFullYear()} Checklitz Printing &amp; Party Needs. All rights reserved.
           </p>
           <p>Graphic Apparel · Custom Printing · Seasonal Releases</p>
