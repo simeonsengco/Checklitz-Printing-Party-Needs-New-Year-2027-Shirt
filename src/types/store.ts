@@ -87,6 +87,16 @@ export interface CheckoutForm {
   bankProvider?: BankProvider;
   codChangeFor?: string;
   notes: string;
+  // Payment proof fields (for gcash, maya, bank-transfer)
+  paymentProof?: File | null;
+  referenceNumber?: string;
+  // GCash/Maya specific
+  ewalletNumber?: string;
+  ewalletAccountName?: string;
+  // Bank transfer specific
+  bankAccountNumber?: string;
+  bankAccountName?: string;
+  bankName?: string;
 }
 
 export interface OrderReceipt {

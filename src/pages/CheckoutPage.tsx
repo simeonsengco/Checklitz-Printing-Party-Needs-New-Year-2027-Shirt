@@ -12,6 +12,8 @@ import {
   ShieldCheck,
   Smartphone,
   Truck,
+  Upload,
+  X,
 } from 'lucide-react';
 import { BUSINESS_INFO, PH_PROVINCES } from '../data/products';
 import {
@@ -101,11 +103,45 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
     notes: '',
   });
   const [copiedKey, setCopiedKey] = useState<'ewallet' | 'landbank' | null>(null);
+  const [paymentProof, setPaymentProof] = useState<File | null>(null);
+  const [paymentProofPreview, setPaymentProofPreview] = useState<string | null>(null);
+
+  const handleProofUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (!file.type.startsWith('image/')) {
+        setErrors(prev => ({ ...prev, paymentProof: 'Please upload an image file (JPG, PNG).' }));
+        return;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        setErrors(prev => ({ ...prev, paymentProof: 'File size must be less than 5MB.' }));
+        return;
+      }
+      setPaymentProof(file);
+      setPaymentProofPreview(URL.createObjectURL(file));
+      if (errors.paymentProof) setErrors(prev => ({ ...prev, paymentProof: undefined }));
+    }
+  };
+
+  const handleRemoveProof = () => {
+    setPaymentProof(null);
+    setPaymentProofPreview(null);
+  };
 
   const [errors, setErrors] = useState<Partial<Record<keyof CheckoutForm, string>>>({});
   const productMap = new Map(products.map((p) => [p.id, p]));
 
   const updateField = <K extends keyof CheckoutForm>(
+    key: K,
+    value: CheckoutForm[K]
+  ) => {
+    setForm((prev) => ({ ...prev, [key]: value }));
+    if (errors[key]) {
+      setErrors((prev) => ({ ...prev, [key]: undefined }));
+    }
+  };
+
+  const updateProofField = <K extends keyof CheckoutForm>(
     key: K,
     value: CheckoutForm[K]
   ) => {
@@ -612,9 +648,165 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
                         </button>
                       </div>
                     </div>
-                    <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                      Send {formatPhp(summary.total)} to {EWALLET_NUMBER} and include your Order Number in your GCash note.
-                    </p>
+                    <div className="space-y-3 pt-2 border-t border-zinc-200 dark:border-zinc-800">
+                      <p className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Proof of Payment</p>
+                      <div className="space-y-2">
+                        {paymentProofPreview ? (
+                          <div className="relative group">
+                            <img src={paymentProofPreview} alt="Payment proof preview" className="max-h-40 rounded-lg border border-zinc-200 dark:border-zinc-700 cursor-pointer" />
+                            <button
+                              type="button"
+                              onClick={handleRemoveProof}
+                              className="absolute top-2 right-2 p-1.5 rounded-full bg-black/60 text-white text-xs opacity-0 group-hover:opacity-100 transition-opacity"
+                              aria-label="Remove proof"
+                            >
+                              <X className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        ) : (
+                          <label className="flex flex-col items-center justify-center w-full min-h-[120px] border-2 border-dashed border-zinc-300 dark:border-zinc-700 rounded-xl cursor-pointer hover:border-[#0D3BFF] dark:hover:border-blue-400 transition-colors">
+                            <Upload className="w-8 h-8 text-zinc-400 dark:text-zinc-500 mb-2" />
+                            <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Upload GCash/Maya Screenshot</span>
+                            <span className="text-xs text-zinc-500 dark:text-zinc-400">JPG/PNG, max 5MB</span>
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={handleProofUpload}
+                              className="sr-only"
+                              aria-label="Upload payment proof"
+                            />
+                          </label>
+                        )}
+                        {errors.paymentProof && (
+                          <p className="text-xs text-red-500">{errors.paymentProof}</p>
+                        )}
+                      </div>
+                      <div>
+                        <label htmlFor="reference-number" className="block text-xs font-semibold text-zinc-800 dark:text-zinc-200 mb-1">
+                          Reference Number *
+                        </label>
+                        <input
+                          id="reference-number"
+                          type="text"
+                          value={form.referenceNumber || ''}
+                          onChange={(e) => updateProofField('referenceNumber', e.target.value)}
+                          placeholder="Enter transaction/reference number"
+                          className="w-full min-h-[42px] px-3.5 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-sm text-zinc-950 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:border-[#0D3BFF]"
+                        />
+                        {errors.referenceNumber && <p className="text-xs text-red-500 mt-1">{errors.referenceNumber}</p>}
+                      </div>
+                      <div>
+                        <label htmlFor="ewallet-number" className="block text-xs font-semibold text-zinc-800 dark:text-zinc-200 mb-1">
+                          Your GCash/Maya Number *
+                        </label>
+                        <input
+                          id="ewallet-number"
+                          type="tel"
+                          inputMode="tel"
+                          value={form.ewalletNumber || ''}
+                          onChange={(e) => updateProofField('ewalletNumber', e.target.value)}
+                          placeholder="0917 123 4567"
+                          className="w-full min-h-[42px] px-3.5 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-sm text-zinc-950 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:border-[#0D3BFF]"
+                        />
+                        {errors.ewalletNumber && <p className="text-xs text-red-500 mt-1">{errors.ewalletNumber}</p>}
+                      </div>
+                      <div>
+                        <label htmlFor="ewallet-account-name" className="block text-xs font-semibold text-zinc-800 dark:text-zinc-200 mb-1">
+                          Your GCash/Maya Account Name *
+                        </label>
+                        <input
+                          id="ewallet-account-name"
+                          type="text"
+                          value={form.ewalletAccountName || ''}
+                          onChange={(e) => updateProofField('ewalletAccountName', e.target.value)}
+                          placeholder="Juan Dela Cruz"
+                          className="w-full min-h-[42px] px-3.5 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-sm text-zinc-950 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:border-[#0D3BFF]"
+                        />
+                        {errors.ewalletAccountName && <p className="text-xs text-red-500 mt-1">{errors.ewalletAccountName}</p>}
+                      </div>
+                    </div>
+                  </>
+                )}
+
+                {form.paymentMethod === 'maya' && (
+                  <>
+                    <div className="space-y-3 pt-2 border-t border-zinc-200 dark:border-zinc-800">
+                      <p className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Proof of Payment</p>
+                      <div className="space-y-2">
+                        {paymentProofPreview ? (
+                          <div className="relative group">
+                            <img src={paymentProofPreview} alt="Payment proof preview" className="max-h-40 rounded-lg border border-zinc-200 dark:border-zinc-700 cursor-pointer" />
+                            <button
+                              type="button"
+                              onClick={handleRemoveProof}
+                              className="absolute top-2 right-2 p-1.5 rounded-full bg-black/60 text-white text-xs opacity-0 group-hover:opacity-100 transition-opacity"
+                              aria-label="Remove proof"
+                            >
+                              <X className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        ) : (
+                          <label className="flex flex-col items-center justify-center w-full min-h-[120px] border-2 border-dashed border-zinc-300 dark:border-zinc-700 rounded-xl cursor-pointer hover:border-[#0D3BFF] dark:hover:border-blue-400 transition-colors">
+                            <Upload className="w-8 h-8 text-zinc-400 dark:text-zinc-500 mb-2" />
+                            <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Upload Maya Screenshot</span>
+                            <span className="text-xs text-zinc-500 dark:text-zinc-400">JPG/PNG, max 5MB</span>
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={handleProofUpload}
+                              className="sr-only"
+                              aria-label="Upload payment proof"
+                            />
+                          </label>
+                        )}
+                        {errors.paymentProof && (
+                          <p className="text-xs text-red-500">{errors.paymentProof}</p>
+                        )}
+                      </div>
+                      <div>
+                        <label htmlFor="reference-number-maya" className="block text-xs font-semibold text-zinc-800 dark:text-zinc-200 mb-1">
+                          Reference Number *
+                        </label>
+                        <input
+                          id="reference-number-maya"
+                          type="text"
+                          value={form.referenceNumber || ''}
+                          onChange={(e) => updateProofField('referenceNumber', e.target.value)}
+                          placeholder="Enter transaction/reference number"
+                          className="w-full min-h-[42px] px-3.5 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-sm text-zinc-950 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:border-[#0D3BFF]"
+                        />
+                        {errors.referenceNumber && <p className="text-xs text-red-500 mt-1">{errors.referenceNumber}</p>}
+                      </div>
+                      <div>
+                        <label htmlFor="maya-number" className="block text-xs font-semibold text-zinc-800 dark:text-zinc-200 mb-1">
+                          Your Maya Number *
+                        </label>
+                        <input
+                          id="maya-number"
+                          type="tel"
+                          inputMode="tel"
+                          value={form.ewalletNumber || ''}
+                          onChange={(e) => updateProofField('ewalletNumber', e.target.value)}
+                          placeholder="0917 123 4567"
+                          className="w-full min-h-[42px] px-3.5 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-sm text-zinc-950 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:border-[#0D3BFF]"
+                        />
+                        {errors.ewalletNumber && <p className="text-xs text-red-500 mt-1">{errors.ewalletNumber}</p>}
+                      </div>
+                      <div>
+                        <label htmlFor="maya-account-name" className="block text-xs font-semibold text-zinc-800 dark:text-zinc-200 mb-1">
+                          Your Maya Account Name *
+                        </label>
+                        <input
+                          id="maya-account-name"
+                          type="text"
+                          value={form.ewalletAccountName || ''}
+                          onChange={(e) => updateProofField('ewalletAccountName', e.target.value)}
+                          placeholder="Juan Dela Cruz"
+                          className="w-full min-h-[42px] px-3.5 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-sm text-zinc-950 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:border-[#0D3BFF]"
+                        />
+                        {errors.ewalletAccountName && <p className="text-xs text-red-500 mt-1">{errors.ewalletAccountName}</p>}
+                      </div>
+                    </div>
                   </>
                 )}
 
@@ -738,9 +930,96 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
                         </button>
                       </div>
                     </div>
-                    <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                      Transfer {formatPhp(summary.total)} via InstaPay or PESONet and include your Order Number in the transfer remarks.
-                    </p>
+                    <div className="space-y-3 pt-2 border-t border-zinc-200 dark:border-zinc-800">
+                      <p className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Proof of Payment</p>
+                      <div className="space-y-2">
+                        {paymentProofPreview ? (
+                          <div className="relative group">
+                            <img src={paymentProofPreview} alt="Payment proof preview" className="max-h-40 rounded-lg border border-zinc-200 dark:border-zinc-700 cursor-pointer" />
+                            <button
+                              type="button"
+                              onClick={handleRemoveProof}
+                              className="absolute top-2 right-2 p-1.5 rounded-full bg-black/60 text-white text-xs opacity-0 group-hover:opacity-100 transition-opacity"
+                              aria-label="Remove proof"
+                            >
+                              <X className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        ) : (
+                          <label className="flex flex-col items-center justify-center w-full min-h-[120px] border-2 border-dashed border-zinc-300 dark:border-zinc-700 rounded-xl cursor-pointer hover:border-[#0D3BFF] dark:hover:border-blue-400 transition-colors">
+                            <Upload className="w-8 h-8 text-zinc-400 dark:text-zinc-500 mb-2" />
+                            <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Upload Bank Transfer Receipt</span>
+                            <span className="text-xs text-zinc-500 dark:text-zinc-400">JPG/PNG, max 5MB</span>
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={handleProofUpload}
+                              className="sr-only"
+                              aria-label="Upload payment proof"
+                            />
+                          </label>
+                        )}
+                        {errors.paymentProof && (
+                          <p className="text-xs text-red-500">{errors.paymentProof}</p>
+                        )}
+                      </div>
+                      <div>
+                        <label htmlFor="reference-number-bank" className="block text-xs font-semibold text-zinc-800 dark:text-zinc-200 mb-1">
+                          Reference Number *
+                        </label>
+                        <input
+                          id="reference-number-bank"
+                          type="text"
+                          value={form.referenceNumber || ''}
+                          onChange={(e) => updateProofField('referenceNumber', e.target.value)}
+                          placeholder="Enter transaction/reference number"
+                          className="w-full min-h-[42px] px-3.5 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-sm text-zinc-950 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:border-[#0D3BFF]"
+                        />
+                        {errors.referenceNumber && <p className="text-xs text-red-500 mt-1">{errors.referenceNumber}</p>}
+                      </div>
+                      <div>
+                        <label htmlFor="bank-account-number" className="block text-xs font-semibold text-zinc-800 dark:text-zinc-200 mb-1">
+                          Bank Account Number *
+                        </label>
+                        <input
+                          id="bank-account-number"
+                          type="text"
+                          value={form.bankAccountNumber || ''}
+                          onChange={(e) => updateProofField('bankAccountNumber', e.target.value)}
+                          placeholder="1234567890"
+                          className="w-full min-h-[42px] px-3.5 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-sm text-zinc-950 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:border-[#0D3BFF]"
+                        />
+                        {errors.bankAccountNumber && <p className="text-xs text-red-500 mt-1">{errors.bankAccountNumber}</p>}
+                      </div>
+                      <div>
+                        <label htmlFor="bank-account-name" className="block text-xs font-semibold text-zinc-800 dark:text-zinc-200 mb-1">
+                          Bank Account Name *
+                        </label>
+                        <input
+                          id="bank-account-name"
+                          type="text"
+                          value={form.bankAccountName || ''}
+                          onChange={(e) => updateProofField('bankAccountName', e.target.value)}
+                          placeholder="Juan Dela Cruz"
+                          className="w-full min-h-[42px] px-3.5 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-sm text-zinc-950 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:border-[#0D3BFF]"
+                        />
+                        {errors.bankAccountName && <p className="text-xs text-red-500 mt-1">{errors.bankAccountName}</p>}
+                      </div>
+                      <div>
+                        <label htmlFor="bank-name" className="block text-xs font-semibold text-zinc-800 dark:text-zinc-200 mb-1">
+                          Bank Name *
+                        </label>
+                        <input
+                          id="bank-name"
+                          type="text"
+                          value={form.bankName || ''}
+                          onChange={(e) => updateProofField('bankName', e.target.value)}
+                          placeholder="Land Bank, BDO, BPI, etc."
+                          className="w-full min-h-[42px] px-3.5 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-sm text-zinc-950 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:border-[#0D3BFF]"
+                        />
+                        {errors.bankName && <p className="text-xs text-red-500 mt-1">{errors.bankName}</p>}
+                      </div>
+                    </div>
                   </>
                 )}
               </motion.div>

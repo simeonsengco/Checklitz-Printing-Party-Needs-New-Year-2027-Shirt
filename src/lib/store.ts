@@ -233,6 +233,35 @@ export function validateCheckoutForm(
     errors.paymentMethod = 'Please select a valid payment method.';
   }
 
+  // Payment proof required for gcash, maya, bank-transfer
+  if (['gcash', 'maya', 'bank-transfer'].includes(form.paymentMethod)) {
+    if (!form.paymentProof || form.paymentProof.size === 0) {
+      errors.paymentProof = 'Please upload a proof of payment (screenshot/receipt).';
+    }
+    if (!form.referenceNumber?.trim()) {
+      errors.referenceNumber = 'Please enter the payment reference/transaction number.';
+    }
+    if (form.paymentMethod === 'gcash' || form.paymentMethod === 'maya') {
+      if (!form.ewalletNumber?.trim()) {
+        errors.ewalletNumber = 'Please enter your GCash/Maya number.';
+      }
+      if (!form.ewalletAccountName?.trim()) {
+        errors.ewalletAccountName = 'Please enter your GCash/Maya account name.';
+      }
+    }
+    if (form.paymentMethod === 'bank-transfer') {
+      if (!form.bankAccountNumber?.trim()) {
+        errors.bankAccountNumber = 'Please enter the bank account number.';
+      }
+      if (!form.bankAccountName?.trim()) {
+        errors.bankAccountName = 'Please enter the bank account name.';
+      }
+      if (!form.bankName?.trim()) {
+        errors.bankName = 'Please enter the bank name.';
+      }
+    }
+  }
+
   return errors;
 }
 
