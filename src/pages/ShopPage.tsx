@@ -87,26 +87,18 @@ export const ShopPage: React.FC<ShopPageProps> = ({
       {/* Filter & Search Toolbar */}
       <div className="space-y-4 mb-8">
         <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-3.5">
-          {/* Category Filter Pills — wrap cleanly so none are ever clipped */}
-          <div
-            role="group"
-            aria-label="Filter by category"
-            className="flex flex-wrap items-center gap-2 min-w-0"
-          >
-            {CATEGORIES.map((category) => (
-              <button
-                key={category}
-                type="button"
-                onClick={() => setSelectedCategory(category)}
-                className={`min-h-[38px] px-3.5 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap shrink-0 transition-colors ${
-                  selectedCategory === category
-                    ? 'bg-zinc-950 dark:bg-[#0D3BFF] text-white'
-                    : 'bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 hover:border-zinc-950 dark:hover:border-zinc-500'
-                }`}
-              >
-                {category}
-              </button>
-            ))}
+          {/* Category Filter Combo Box — matches Price/Select style */}
+          <div className="w-full xl:w-auto shrink-0">
+            <select
+              aria-label="Filter by category"
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value as ProductCategory | 'All')}
+              className="min-h-[40px] w-full xl:w-48 px-3 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-xs font-medium text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-[#0D3BFF] whitespace-nowrap"
+            >
+              {CATEGORIES.map((category) => (
+                <option key={category} value={category}>{category}</option>
+              ))}
+            </select>
           </div>
 
           {/* Search, Price, Sort Controls — single aligned row on sm+ */}
@@ -123,13 +115,13 @@ export const ShopPage: React.FC<ShopPageProps> = ({
               />
             </div>
 
-            <div className="grid grid-cols-2 sm:flex sm:items-center gap-2 shrink-0">
+            <div className="flex flex-wrap sm:flex-nowrap items-center gap-2 shrink-0">
               <SlidersHorizontal className="w-4 h-4 text-zinc-500 dark:text-zinc-400 hidden sm:block shrink-0" />
               <select
                 aria-label="Filter by price range"
                 value={priceFilter}
                 onChange={(e) => setPriceFilter(e.target.value as PriceFilter)}
-                className="min-h-[40px] px-3 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-xs font-medium text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-[#0D3BFF] whitespace-nowrap"
+                className="min-h-[40px] flex-1 min-w-[120px] px-3 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-xs font-medium text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-[#0D3BFF] whitespace-nowrap"
               >
                 <option value="all">All Prices</option>
                 <option value="under-600">Under ₱600</option>
@@ -141,7 +133,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({
                 aria-label="Sort products"
                 value={sortOption}
                 onChange={(e) => setSortOption(e.target.value as SortOption)}
-                className="min-h-[40px] px-3 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-xs font-medium text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-[#0D3BFF] whitespace-nowrap"
+                className="min-h-[40px] flex-1 min-w-[120px] px-3 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-xs font-medium text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-[#0D3BFF] whitespace-nowrap"
               >
                 <option value="featured">Sort: Featured</option>
                 <option value="price-asc">Price: Low to High</option>
