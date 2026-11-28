@@ -57,27 +57,33 @@ export function authenticateBearer(token: string): { email: string } | null {
 }
 export function revokeSession(token: string): void { activeSessions.delete(token); }
 
-export default function handler(req: VercelRequest & { body: { action?: string; email?: string; password?: string } }, res: VercelResponse) {
-  const { action, email, password } = req.body || {};
-  if (action === 'login') {
-    if (!isAdminConfigured()) return res.status(503).json({ error: 'Admin not configured. Set ADMIN_PASSWORD env var.' });
-    if (!verifyAdminCredentials(email, password)) return res.status(401).json({ error: 'Invalid email or password.' });
-    const { token, expiresAt } = issueSession(email);
-    return res.json({ token, email, expiresAt });
+export default function handler(req: any, res: VercelResponse) {
+  try {
+    const { action, email, password } = req.body || {};
+    console.log('DEBUG: action=', action, 'email=', email);
+    if (action === 'login') {
+      if (!isAdminConfigured()) return res.status(503).json({ error: 'Admin not configured. Set ADMIN_PASSWORD env var.' });
+      if (!verifyAdminCredentials(email, password)) return res.status(401).json({ error: 'Invalid email or password.' });
+      const { token, expiresAt } = issueSession(email);
+      return res.json({ token, email, expiresAt });
+    }
+    if (action === 'logout') {
+      const m = (req.headers.authorization || '').match(/^Bearer\s+(.+)$/i);
+      if (m) revokeSession(m[1]);
+      return res.json({ success: true });
+    }
+    if (action === 'status') {
+      const m = (req.headers.authorization || '').match(/^Bearer\s+(.+)$/i);
+      if (!m) return res.status(401).json({ error: 'Missing Bearer token.' });
+      const v = authenticateBearer(m[1]);
+      if (!v) return res.status(401).json({ error: 'Invalid or revoked session.' });
+      return res.json({ email: v.email });
+    }
+    res.status(400).json({ error: 'Unknown action.' });
+  } catch (e: any) {
+    console.error('AUTH HANDLER ERROR:', e.message, e.stack);
+    res.status(500).json({ error: 'Internal server error: ' + e.message });
   }
-  if (action === 'logout') {
-    const m = (req.headers.authorization || '').match(/^Bearer\s+(.+)$/i);
-    if (m) revokeSession(m[1]);
-    return res.json({ success: true });
-  }
-  if (action === 'status') {
-    const m = (req.headers.authorization || '').match(/^Bearer\s+(.+)$/i);
-    if (!m) return res.status(401).json({ error: 'Missing Bearer token.' });
-    const v = authenticateBearer(m[1]);
-    if (!v) return res.status(401).json({ error: 'Invalid or revoked session.' });
-    return res.json({ email: v.email });
-  }
-  res.status(400).json({ error: 'Unknown action.' });
 }
 
 export const config = { api: { bodyParser: true } };
