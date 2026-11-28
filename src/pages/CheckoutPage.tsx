@@ -18,7 +18,6 @@ import {
 import { BUSINESS_INFO, PH_PROVINCES } from '../data/products';
 import {
   formatPhp,
-  generateOrderNumber,
   getPaymentMethodSummary,
   validateCheckoutForm,
 } from '../lib/store';
@@ -114,6 +113,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
   const [copiedKey, setCopiedKey] = useState<'ewallet' | 'landbank' | null>(null);
   const [paymentProof, setPaymentProof] = useState<File | null>(null);
   const [paymentProofPreview, setPaymentProofPreview] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
 
   const handleProofUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -168,40 +168,49 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
       return;
     }
 
-    const orderItems = cart
-      .map((item) => {
-        const product = productMap.get(item.productId);
-        if (!product) return null;
-        return {
-          product,
-          size: item.size,
-          quantity: item.quantity,
-          lineTotal: product.price * item.quantity,
-        };
-      })
-      .filter((entry): entry is NonNullable<typeof entry> => entry !== null);
-
     const proofFile = form.paymentProof || null;
     const proofBase64 =
       proofFile && proofFile instanceof File
         ? await readFileAsDataURL(proofFile)
         : null;
 
-    const receipt: OrderReceipt = {
-      orderNumber: generateOrderNumber(),
-      createdAt: new Date().toLocaleString('en-PH', {
-        dateStyle: 'medium',
-        timeStyle: 'short',
-      }),
-      customer: { ...form },
-      items: orderItems,
-      summary: { ...summary },
-    };
-
-    // Persist payment proof as a base64 data URL on the receipt so admin can view it.
-    ;(receipt.customer as any).paymentProofBase64 = proofBase64;
-
-    onOrderComplete(receipt);
+    setSubmitting(true);
+    try {
+      const response = await fetch('/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          cart: cart.map((c) => ({
+            productId: c.productId,
+            size: c.size,
+            quantity: c.quantity,
+          })),
+          form: {
+            ...form,
+            // Server validates file signature; send only the base64 payload.
+            paymentProof: undefined,
+            paymentProofBase64: proofBase64,
+          },
+          products,
+        }),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        setErrors((prev) => ({
+          ...prev,
+          ...(data.error ? { fullName: data.error } : {}),
+        }));
+        return;
+      }
+      onOrderComplete(data.order);
+    } catch {
+      setErrors((prev) => ({
+        ...prev,
+        fullName: 'We could not reach the server. Please try again.',
+      }));
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   // Post-Order Confirmation View
@@ -1046,12 +1055,22 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
 
           <motion.button
             type="submit"
+            disabled={submitting}
             whileTap={{ scale: 0.99 }}
             data-testid="place-order-button"
-            className="w-full min-h-[48px] px-6 py-3.5 rounded-xl bg-zinc-950 dark:bg-[#0D3BFF] text-white text-sm font-semibold hover:bg-[#0D3BFF] dark:hover:bg-blue-500 transition-colors flex items-center justify-center gap-2"
+            className="w-full min-h-[48px] px-6 py-3.5 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition-colors {submitting ? 'bg-zinc-400 text-zinc-200 cursor-not-allowed' : 'bg-zinc-950 dark:bg-[#0D3BFF] text-white hover:bg-[#0D3BFF] dark:hover:bg-blue-500'}"
           >
-            <ShieldCheck className="w-4 h-4" />
-            <span>Place Order — {formatPhp(summary.total)}</span>
+            {submitting ? (
+              <>
+                <svg className="animate-spin -ml-1 mr-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                <span>Processing...</span>
+              </>
+            ) : (
+              <>
+                <ShieldCheck className="w-4 h-4" />
+                <span>Place Order — {formatPhp(summary.total)}</span>
+              </>
+            )}
           </motion.button>
         </form>
 

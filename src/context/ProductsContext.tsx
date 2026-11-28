@@ -4,7 +4,14 @@ import { PRODUCTS as BASE_PRODUCTS } from '../data/products';
 
 export const OVERRIDES_KEY = 'checklitz_product_overrides_v1';
 
-function readOverrides(): Record<string, { price?: number; soldOut?: boolean }> {
+export interface ProductOverride {
+  price?: number;
+  compareAtPrice?: number;
+  tag?: string;
+  soldOut?: boolean;
+}
+
+function readOverrides(): Record<string, ProductOverride> {
   try {
     const raw = localStorage.getItem(OVERRIDES_KEY);
     return raw ? JSON.parse(raw) : {};
@@ -15,7 +22,7 @@ function readOverrides(): Record<string, { price?: number; soldOut?: boolean }> 
 
 function applyOverrides(
   base: Product[],
-  overrides: Record<string, { price?: number; soldOut?: boolean }>
+  overrides: Record<string, ProductOverride>
 ): Product[] {
   return base.map((p) => {
     const o = overrides[p.id];
@@ -23,6 +30,9 @@ function applyOverrides(
     return {
       ...p,
       price: typeof o.price === 'number' ? o.price : p.price,
+      compareAtPrice:
+        typeof o.compareAtPrice === 'number' ? o.compareAtPrice : p.compareAtPrice,
+      tag: typeof o.tag === 'string' ? o.tag : p.tag,
       soldOut: typeof o.soldOut === 'boolean' ? o.soldOut : p.soldOut ?? false,
     };
   });
@@ -30,21 +40,14 @@ function applyOverrides(
 
 interface ProductsContextValue {
   products: Product[];
-  updateProduct: (
-    id: string,
-    updates: { price?: number; soldOut?: boolean }
-  ) => void;
+  updateProduct: (id: string, updates: ProductOverride) => void;
+  replaceOverrides: (all: Record<string, ProductOverride>) => void;
 }
 
-const ProductsContext = createContext<ProductsContextValue | undefined>(
-  undefined
-);
+const ProductsContext = createContext<ProductsContextValue | undefined>(undefined);
 
 export const ProductsProvider = ({ children }: { children: React.ReactNode }) => {
-  const [overrides, setOverrides] = useState<Record<string, {
-    price?: number;
-    soldOut?: boolean;
-  }>>({});
+  const [overrides, setOverrides] = useState<Record<string, ProductOverride>>({});
 
   useEffect(() => {
     setOverrides(readOverrides());
@@ -53,14 +56,9 @@ export const ProductsProvider = ({ children }: { children: React.ReactNode }) =>
     return () => window.removeEventListener('storage', handler);
   }, []);
 
-  const products = useMemo(() => applyOverrides(BASE_PRODUCTS, overrides), [
-    overrides,
-  ]);
+  const products = useMemo(() => applyOverrides(BASE_PRODUCTS, overrides), [overrides]);
 
-  const updateProduct = (
-    id: string,
-    updates: { price?: number; soldOut?: boolean }
-  ) => {
+  const updateProduct = (id: string, updates: ProductOverride) => {
     const current = readOverrides();
     const merged = { ...current[id], ...updates };
     const next = { ...current, [id]: merged };
@@ -68,8 +66,13 @@ export const ProductsProvider = ({ children }: { children: React.ReactNode }) =>
     setOverrides(next);
   };
 
+  const replaceOverrides = (all: Record<string, ProductOverride>) => {
+    localStorage.setItem(OVERRIDES_KEY, JSON.stringify(all));
+    setOverrides(all);
+  };
+
   return (
-    <ProductsContext.Provider value={{ products, updateProduct }}>
+    <ProductsContext.Provider value={{ products, updateProduct, replaceOverrides }}>
       {children}
     </ProductsContext.Provider>
   );

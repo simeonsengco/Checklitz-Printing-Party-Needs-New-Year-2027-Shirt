@@ -148,6 +148,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         </div>
 
         <div className="pt-2.5 border-t border-zinc-100 dark:border-zinc-800/90 flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-3">
+          {product.compareAtPrice && product.compareAtPrice > product.price && (
+            <span className="text-[11px] sm:text-xs font-medium line-through text-zinc-500 dark:text-zinc-500/70">
+              {formatPhp(product.compareAtPrice)}
+            </span>
+          )}
           <span className="font-mono tabular-nums text-[15px] sm:text-base font-semibold text-zinc-950 dark:text-white">
             {formatPhp(product.price)}
           </span>
